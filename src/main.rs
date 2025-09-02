@@ -1,40 +1,60 @@
-mod models;
-mod packer;
+// mod models;
+// mod packer;
+// use tokio::net::{TcpListener, TcpStream};
+// use mini_redis::{Connection, Frame};
+use actix_web::{get, post, web, App, HttpResponse, HttpServer, Responder};
 // use cfg_if::cfg_if;
 
 // use gelf_logger::{GelfLogger, GelfLoggerBuilder};
-use log::{info};
+use log::{info, LevelFilter};
+
+mod logger;
 // use log::Level;
-use models::item::Item;
-use models::basebox::BoxConstraints;
-use packer::packer::pack_items;
+// use models::item::Item;
+// use models::basebox::BoxConstraints;
+// use packer::packer::pack_items;
+// use start::logger;
 
-fn main() {
-    // log::set_logger(console_log)
-    // console_log::init_with_level(Level::Trace);
-    //     let number = match number_str.parse::<i32>() {
-    //     Ok(number)  => number,
-    //     Err(e) => return Err(e),
-    // };
-    let items = vec![
-        Item { id: 1, width: 100, height: 200, depth: 150, weight: 500, price: 1000 },
-        Item { id: 2, width: 80, height: 100, depth: 100, weight: 300, price: 500 },
-        Item { id: 3, width: 90, height: 150, depth: 100, weight: 700, price: 900 },
-        Item { id: 4, width: 120, height: 200, depth: 120, weight: 600, price: 800 },
-    ];
+// #[tokio::main]
+// async fn main() {
+//     simple_logger::init_with_level(Level::Trace).expect("logger init failed");
+//     println!("Listening");
+//     info!("Сервіс запущено");
+// }
 
+#[actix_web::main]
+async fn main() -> std::io::Result<()> {
+    logger::init_logger(
+        LevelFilter::Trace,
+        LevelFilter::Info,
+        Some("127.0.0.1:12201"), // адреса Graylog UDP input
+    );
+    println!("Listening");
     info!("Сервіс запущено");
-    let constraints = BoxConstraints {
-        max_width: 300,
-        max_height: 400,
-        max_depth: 300,
-        max_weight: 2000,
-        max_price: 3000,
-    };
+    HttpServer::new(|| {
+        App::new()
+            // .data(web::JsonConfig::default().limit(4096)) 
+            .service(hello)
+            .service(echo)
+            .route("/hey", web::get().to(manual_hello))
+    })
+    .bind(("127.0.0.1", 8080))?
+    .run()
+    .await
+}
 
-    let packed = pack_items(items, constraints);
+#[get("/")]
+async fn hello() -> impl Responder {
+    HttpResponse::Ok().body("Hello world!")
+}
 
-    for (i, b) in packed.iter().enumerate() {
-        println!("Box {}: {:?}", i + 1, b.items.iter().map(|it| it.id).collect::<Vec<_>>());
-    }
+#[post("/echo")]
+async fn echo(req_body: String) -> impl Responder {
+    HttpResponse::Ok().body(req_body)
+}
+
+async fn manual_hello() -> impl Responder {
+
+    info!("hello");
+    HttpResponse::Ok().body("Hey there!")
 }
