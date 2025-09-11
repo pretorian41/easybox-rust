@@ -1,5 +1,5 @@
-// mod models;
-// mod packer;
+ mod models;
+ mod packer;
 // use tokio::net::{TcpListener, TcpStream};
 // use mini_redis::{Connection, Frame};
 use actix_web::{get, post, web, App, HttpResponse, HttpServer, Responder};
@@ -10,9 +10,9 @@ use log::{info, LevelFilter};
 
 mod logger;
 // use log::Level;
-// use models::item::Item;
-// use models::basebox::BoxConstraints;
-// use packer::packer::pack_items;
+use models::item::Item;
+use models::basebox::BoxConstraints;
+use packer::packer::pack_items;
 // use start::logger;
 
 // #[tokio::main]
@@ -35,7 +35,7 @@ async fn main() -> std::io::Result<()> {
         App::new()
             // .data(web::JsonConfig::default().limit(4096)) 
             .service(hello)
-            .service(echo)
+            .service(pack)
             .route("/hey", web::get().to(manual_hello))
     })
     .bind(("127.0.0.1", 8080))?
@@ -48,10 +48,23 @@ async fn hello() -> impl Responder {
     HttpResponse::Ok().body("Hello world!")
 }
 
-#[post("/echo")]
-async fn echo(req_body: String) -> impl Responder {
-    HttpResponse::Ok().body(req_body)
+#[post("/pack")]
+async fn pack(
+    web::Json(items): web::Json<Vec<Item>>,
+) -> impl Responder {
+    let constraints = BoxConstraints {
+        max_width: 200,
+        max_height: 300,
+        max_depth: 200,
+        max_weight: 500,
+        max_price: 1000,
+    };
+
+    let packed_boxes = pack_items(items, constraints);
+
+    HttpResponse::Ok().json(packed_boxes)
 }
+
 
 async fn manual_hello() -> impl Responder {
 

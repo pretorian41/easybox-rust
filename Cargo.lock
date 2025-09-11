@@ -1368,6 +1368,8 @@ dependencies = [
  "log",
  "mini-redis",
  "multi_log",
+ "serde",
+ "serde_json",
  "simple_logger",
  "tokio",
 ]

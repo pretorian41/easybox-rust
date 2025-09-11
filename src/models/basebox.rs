@@ -1,5 +1,7 @@
 use crate::models::item::Item;
-#[derive(Debug)]
+use serde::{Serialize};
+
+#[derive(Debug, Serialize)]
 pub struct BoxConstraints {
     pub max_width: u32,
     pub max_height: u32,
@@ -8,7 +10,7 @@ pub struct BoxConstraints {
     pub max_price: u32,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Serialize)]
 pub struct BoxInstance {
     pub items: Vec<Item>,
     pub constraints: BoxConstraints,
