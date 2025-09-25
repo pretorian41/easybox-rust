@@ -1,6 +1,8 @@
-#[derive(Debug)]
+use serde::{Deserialize, Serialize};
+
+#[derive(Debug, Deserialize, Serialize)]
 pub struct Item {
-    pub id: u32,
+    pub id: String,
     pub width: u32,
     pub height: u32,
     pub depth: u32,

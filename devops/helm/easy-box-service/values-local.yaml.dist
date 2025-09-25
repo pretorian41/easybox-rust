@@ -1,0 +1,14 @@
+replicaCount: 1
+
+image:
+  prefix: my-rust-api
+  tag: latest
+  pullPolicy: IfNotPresent
+
+service:
+  type: ClusterIP
+  port: 80
+  targetPort: 8080 # The port your Rust API listens on
+
+env:
+  MY_API_KEY: "some-secret-key"

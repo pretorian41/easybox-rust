@@ -1,0 +1,12 @@
+replicaCount: 1
+
+image:
+  repository: pretorian41/easy-box-service
+  tag: "latest"
+  pullPolicy: IfNotPresent
+
+service:
+  type: ClusterIP
+  port: 8080
+
+resources: {}

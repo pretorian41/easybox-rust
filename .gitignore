@@ -1,1 +1,3 @@
 /target
+devops/bin/.last_build_version
+devops/helm/easy-box-service/values-local.yaml
